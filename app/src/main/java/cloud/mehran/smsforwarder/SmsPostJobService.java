@@ -20,11 +20,11 @@ public class SmsPostJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         Log.d(TAG, "Job started");
-        doBackgroundWork(jobParameters);
+        sendToTelegram(jobParameters);
         return true;
     }
 
-    private void doBackgroundWork(JobParameters jobParameters) {
+    private void sendToTelegram(JobParameters jobParameters) {
         new Thread(new Runnable() {
             @Override
             public void run() {
