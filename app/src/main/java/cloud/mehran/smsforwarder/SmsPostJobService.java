@@ -20,50 +20,63 @@ public class SmsPostJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         Log.d(TAG, "Job started");
+
         sendToTelegram(jobParameters);
+
+        Log.d(TAG, "Job finished");
+
+        jobFinished(jobParameters, false);
+
         return true;
     }
 
     private void sendToTelegram(JobParameters jobParameters) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //format the message body for the telegram message
-                StringBuilder text = new StringBuilder();
-                text.append("<pre>");
-                text.append("From: ").append(jobParameters.getExtras().getString("sender")).append("\n");
-                text.append("To: ").append(jobParameters.getExtras().getString("receiver")).append("\n");
-                text.append("Message: ").append(jobParameters.getExtras().getString("body"));
-                text.append("</pre>");
+        //format the message body for the telegram message
+        StringBuilder text = new StringBuilder();
+        text.append("<pre>");
+        text.append("From: ").append(jobParameters.getExtras().getString("sender")).append("\n");
+        text.append("To: ").append(jobParameters.getExtras().getString("receiver")).append("\n");
+        text.append("Message: ").append(jobParameters.getExtras().getString("body"));
+        text.append("</pre>");
 
-                //build the POST request to the api
-                String chat_id = BuildConfig.SMS_US_CHAT_ID;
+        //build the POST request
+        String chat_id = BuildConfig.SMS_US_CHAT_ID;
 
-                RequestBody formBody = new FormBody.Builder()
-                        .add("chat_id", chat_id)
-                        .add("text", text.toString())
-                        .add("parse_mode", "HTML")
-                        .build();
+        RequestBody formBody = new FormBody.Builder()
+                .add("chat_id", chat_id)
+                .add("text", text.toString())
+                .add("parse_mode", "HTML")
+                .build();
 
-                Request request = new Request.Builder()
-                        .url(BuildConfig.TELEGRAM_API_URL)
-                        .post(formBody)
-                        .build();
+        Request postRequest = new Request.Builder()
+                .url(BuildConfig.TELEGRAM_API_URL)
+                .post(formBody)
+                .build();
 
-                OkHttpClient client = new OkHttpClient();
-                Call call = client.newCall(request);
+        Thread httpThread = new httpRequestThread(postRequest);
+        httpThread.setPriority(10);
+        httpThread.start();
+    }
 
-                try {
-                    Response response = call.execute();
-                    Objects.requireNonNull(response.body()).close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
-                Log.d(TAG, "Job finished");
-                jobFinished(jobParameters, false);
+    static class httpRequestThread extends Thread {
+        Request request;
+        httpRequestThread(Request request){
+            this.request = request;
+        }
+
+        @Override
+        public void run() {
+            OkHttpClient client = new OkHttpClient();
+            Call call = client.newCall(request);
+
+            try {
+                Response response = call.execute();
+                Objects.requireNonNull(response.body()).close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }).start();
+        }
     }
 
     @Override
