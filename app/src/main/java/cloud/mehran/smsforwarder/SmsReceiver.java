@@ -66,25 +66,20 @@ public class SmsReceiver extends BroadcastReceiver {
         }
 
         //bundling up the message info
-        ComponentName componentName = new ComponentName(context, SmsPostJobService.class);
-        PersistableBundle bundle = new PersistableBundle();
-        bundle.putString("receiver", simNumber);
-        bundle.putString("sender", messageSender);
-        bundle.putString("body", messageBody);
+        PersistableBundle messageBundle = new PersistableBundle();
+        messageBundle.putString("receiver", simNumber);
+        messageBundle.putString("sender", messageSender);
+        messageBundle.putString("body", messageBody);
 
-        //TODO check for forward options
-        //email | telegram | ...
-
-        //schedule the telegram job
-        JobInfo info = new JobInfo.Builder(123, componentName)
+        //schedule the Forward job
+        ComponentName forwarderJobService = new ComponentName(context, ForwarderJobService.class);
+        JobInfo info = new JobInfo.Builder(123, forwarderJobService)
                 .setPersisted(true)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setExtras(bundle)
+                .setExtras(messageBundle)
                 .build();
-
         JobScheduler scheduler = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
         int resultCode = scheduler.schedule(info);
-
         if (resultCode == JobScheduler.RESULT_SUCCESS) {
             Log.d(TAG, "Job scheduled");
         } else {

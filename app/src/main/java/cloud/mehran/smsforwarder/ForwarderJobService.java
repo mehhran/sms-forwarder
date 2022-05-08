@@ -14,12 +14,15 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class SmsPostJobService extends JobService {
-    private static final String TAG = "SmsPostJobService";
+public class ForwarderJobService extends JobService {
+    private static final String TAG = "ForwarderJobService";
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         Log.d(TAG, "Job started");
+
+        //TODO check for forward options
+        //email | telegram | ...
 
         sendToTelegram(jobParameters);
 
