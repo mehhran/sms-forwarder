@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
     private static final int MY_REQUEST_CODE = 1;
+    Button btnStartService, btnStopService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,31 @@ public class MainActivity extends AppCompatActivity {
                             Manifest.permission.RECEIVE_SMS},
                     MY_REQUEST_CODE);
         }*/
+
+        btnStartService = findViewById(R.id.buttonStartService);
+        btnStopService = findViewById(R.id.buttonStopService);
+        btnStartService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startService();
+            }
+        });
+        btnStopService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopService();
+            }
+        });
+    }
+
+    public void startService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        serviceIntent.putExtra("inputExtra", "Listening for new messages...");
+        ContextCompat.startForegroundService(this, serviceIntent);
+    }
+    public void stopService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        stopService(serviceIntent);
     }
 
     @Override
