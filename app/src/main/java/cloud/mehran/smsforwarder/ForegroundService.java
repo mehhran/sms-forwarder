@@ -20,32 +20,30 @@ public class ForegroundService extends Service{
     BroadcastReceiver SmsBroadcastReceiver = new SmsReceiver();
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+
+        IntentFilter filter = new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
+        ContextCompat.registerReceiver(this, SmsBroadcastReceiver, filter, ContextCompat.RECEIVER_EXPORTED);
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String input = intent.getStringExtra("inputExtra");
         createNotificationChannel();
-        // If the notification supports a direct reply action, use
-        // PendingIntent.FLAG_MUTABLE instead.
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
-
         Notification notification =
                 new Notification.Builder(this, CHANNEL_ID)
                         .setContentTitle("Forwarding Is Active")
                         .setContentText(input)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setBadgeIconType(R.mipmap.ic_launcher)
                         .setContentIntent(pendingIntent)
                         .build();
-
         // Notification ID cannot be 0.
         startForeground(1, notification);
-
-
-        IntentFilter filter = new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
-        ContextCompat.registerReceiver(getApplicationContext(), SmsBroadcastReceiver, filter, ContextCompat.RECEIVER_EXPORTED);
-
-        return START_NOT_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     @Nullable
@@ -56,8 +54,8 @@ public class ForegroundService extends Service{
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(SmsBroadcastReceiver);
         super.onDestroy();
+        unregisterReceiver(SmsBroadcastReceiver);
     }
 
     private void createNotificationChannel() {
