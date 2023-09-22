@@ -56,6 +56,8 @@ public class ForegroundService extends Service{
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(SmsBroadcastReceiver);
+        Intent broadcastIntent = new Intent(this, ServiceRestarterBroadcastReceiver.class);
+        sendBroadcast(broadcastIntent);
     }
 
     private void createNotificationChannel() {
