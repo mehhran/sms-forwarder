@@ -16,15 +16,20 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 public class ForegroundService extends Service{
+    public static boolean isServiceRunning;
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     BroadcastReceiver SmsBroadcastReceiver = new SmsReceiver();
+
+    public ForegroundService() {
+        isServiceRunning = false;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-
         IntentFilter filter = new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
         ContextCompat.registerReceiver(this, SmsBroadcastReceiver, filter, ContextCompat.RECEIVER_EXPORTED);
+        isServiceRunning = true;
     }
 
     @Override
@@ -55,9 +60,8 @@ public class ForegroundService extends Service{
     @Override
     public void onDestroy() {
         super.onDestroy();
+        isServiceRunning = false;
         unregisterReceiver(SmsBroadcastReceiver);
-        Intent broadcastIntent = new Intent(this, ServiceRestarterBroadcastReceiver.class);
-        sendBroadcast(broadcastIntent);
     }
 
     private void createNotificationChannel() {

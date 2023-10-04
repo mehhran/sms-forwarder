@@ -39,12 +39,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver
-            android:name=".ServiceRestarterBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true"
-            android:label="RestartServiceWhenStopped">
-        </receiver>
     </application>
 
 </manifest>
