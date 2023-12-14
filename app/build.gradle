@@ -17,8 +17,8 @@ android {
         versionName "1.2.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "TELEGRAM_API_URL", localProperties['telegram_api_url'])
-        buildConfigField("String", "SMS_US_CHAT_ID", localProperties['sms_us_chat_id'])
+        buildConfigField("String", "PROXY_API_URL", localProperties['proxy_api_url'])
+        buildConfigField("String", "PROXY_API_TOKEN", localProperties['proxy_api_token'])
     }
 
     buildTypes {

@@ -24,7 +24,7 @@ public class ForwarderJobService extends JobService {
         //TODO check for forward options
         //email | telegram | ...
 
-        sendToTelegram(jobParameters);
+        sendToProxyServer(jobParameters);
 
         Log.d(TAG, "Job finished");
 
@@ -33,27 +33,19 @@ public class ForwarderJobService extends JobService {
         return true;
     }
 
-    private void sendToTelegram(JobParameters jobParameters) {
-        //format the message body for the telegram message
-        StringBuilder text = new StringBuilder();
-        text.append("<pre>");
-        text.append("From: ").append(jobParameters.getExtras().getString("sender")).append("\n");
-        text.append("To: ").append(jobParameters.getExtras().getString("receiver")).append("\n");
-        text.append("Message: ").append(jobParameters.getExtras().getString("body"));
-        text.append("</pre>");
+    private void sendToProxyServer(JobParameters jobParameters) {
 
         //build the POST request
-        String chat_id = BuildConfig.SMS_US_CHAT_ID;
-
         RequestBody formBody = new FormBody.Builder()
-                .add("chat_id", chat_id)
-                .add("text", text.toString())
-                .add("parse_mode", "HTML")
+                .add("sender", jobParameters.getExtras().getString("sender"))
+                .add("receiver", jobParameters.getExtras().getString("receiver"))
+                .add("Message", jobParameters.getExtras().getString("body"))
                 .build();
 
         Request postRequest = new Request.Builder()
-                .url(BuildConfig.TELEGRAM_API_URL)
+                .url(BuildConfig.PROXY_API_URL)
                 .post(formBody)
+                .addHeader("authorization", BuildConfig.PROXY_API_TOKEN)
                 .build();
 
         Thread httpThread = new httpRequestThread(postRequest);
