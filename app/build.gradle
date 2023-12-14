@@ -11,8 +11,8 @@ android {
 
     defaultConfig {
         applicationId "cloud.mehran.smsforwarder"
-        minSdk 28
-        targetSdk 33
+        minSdk 23
+        targetSdk 30
         versionCode 1
         versionName "1.2.1"
 
