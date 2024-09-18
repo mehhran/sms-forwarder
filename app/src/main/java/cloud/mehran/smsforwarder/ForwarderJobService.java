@@ -44,8 +44,8 @@ public class ForwarderJobService extends JobService {
 
         Request postRequest = new Request.Builder()
                 .url(BuildConfig.PROXY_API_URL)
+                .addHeader("X-Auth-Token", BuildConfig.PROXY_API_TOKEN)
                 .post(formBody)
-                .addHeader("authorization", BuildConfig.PROXY_API_TOKEN)
                 .build();
 
         Thread httpThread = new httpRequestThread(postRequest);

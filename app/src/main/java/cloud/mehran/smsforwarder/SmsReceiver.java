@@ -73,10 +73,14 @@ public class SmsReceiver extends BroadcastReceiver {
 
         //schedule the Forward job
         ComponentName forwarderJobService = new ComponentName(context, ForwarderJobService.class);
+//        JobInfo info = new JobInfo.Builder(123, forwarderJobService)
+//                .setPersisted(true)
+//                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+//                .setExtras(messageBundle)
+//                .build();
         JobInfo info = new JobInfo.Builder(123, forwarderJobService)
-                .setPersisted(true)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setExtras(messageBundle)
+                .setOverrideDeadline(1000)
                 .build();
         JobScheduler scheduler = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
         int resultCode = scheduler.schedule(info);
